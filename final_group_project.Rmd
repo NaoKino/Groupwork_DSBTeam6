@@ -131,14 +131,29 @@ Strings are usually not a useful format for classification problems. The strings
 ***Strings to Factors***
 
 -   `category`, Category of Merchant
+
 -   `job`, Job of Credit Card Holder
+
+    ```{r}
+    card_fraud <- card_fraud %>% 
+      mutate(
+        #strings to factor - category and job
+        category = factor(category),
+        job = factor(job)
+      )
+    ```
 
 ***Strings to Geospatial Data***
 
 We have plenty of geospatial data as lat/long pairs, so I want to convert city/state to lat/long so I can compare to the other geospatial variables. This will also make it easier to compute new variables like the distance the transaction is from the home location.
 
 -   `city`, City of Credit Card Holder
+
 -   `state`, State of Credit Card Holder
+
+    ```{r}
+
+    ```
 
 ## Exploring factors: how is the compactness of categories?
 
