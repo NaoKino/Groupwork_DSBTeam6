@@ -153,8 +153,14 @@ We have plenty of geospatial data as lat/long pairs, so I want to convert city/s
 
     ```{r}
     library(tidygeocoder)
+    library(tmap)
+    library(sf)
+    library(usethis)
+    library(tidyverse)
+    library(rnaturalearth)
+    library(patchwork)
 
-        
+        install.packages("rnaturalearthdata")
             
     #    card_fraud %>% 
     #      group_by(state) %>% 
@@ -170,15 +176,6 @@ We have plenty of geospatial data as lat/long pairs, so I want to convert city/s
           count(state, sort=TRUE) %>%
           mutate(address_geo = purrr::map(state, geo, method = "osm")) %>%
           unnest_wider(address_geo)
-
-    library(tmap)
-    library(sf)
-    library(usethis)
-    library(tidyverse)
-    library(rnaturalearth)
-    library(patchwork)
-            
-        install.packages("rnaturalearthdata")
         
         usa <- ne_countries(scale = "medium", returnclass = "sf") %>% 
           filter(name != "Antarctica") %>%
