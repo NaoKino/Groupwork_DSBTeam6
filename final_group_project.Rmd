@@ -152,6 +152,11 @@ We have plenty of geospatial data as lat/long pairs, so I want to convert city/s
 -   `state`, State of Credit Card Holder
 
     ```{r}
+    library(tidygeocoder)
+
+    card_fraud <- card_fraud %>% 
+      distinct(city) %>% 
+      geo(city, method = "osm")
 
     ```
 
