@@ -118,6 +118,15 @@ card_fraud <- card_fraud %>%
 
 You have done some EDA and you can pool together your group's expertise in which variables to use as features. You can reuse your EDA from earlier, but we expect at least a few visualisations and/or tables to explore teh dataset and identify any useful features.
 
+```{r}
+
+#summarise how many frauds each year
+card_fraud %>%
+  filter(is_fraud == 1) %>% 
+  group_by(year) %>%
+  summarise(count = n())
+```
+
 Group all variables by type and examine each variable class by class. The dataset has the following types of variables:
 
 1.  Strings
