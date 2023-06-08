@@ -125,6 +125,55 @@ card_fraud %>%
   filter(is_fraud == 1) %>% 
   group_by(year) %>%
   summarise(count = n())
+
+# summarizes the total amount of legitimate and fraudulent transactions per year and calculate the % of fraudulent transactions, in US$ terms.
+card_fraud %>% 
+  # Group by fraud cases and summarise total amount of each case
+  group_by(year,is_fraud) %>% 
+  summarise(sum_amt = sum(amt)) %>% 
+  # Find % of each transaction type in US$ terms
+  mutate (percent_fraud = 100*(sum_amt/sum(sum_amt,year = year)))
+
+#Generate a histogram that shows the distribution of amounts charged to credit card, both for legitimate and fraudulent accounts. Also, for both types of transactions, calculate some quick summary statistics.
+card_fraud %>% 
+  # Group by fraud cases and amount and summarise total amount of each case
+  group_by(is_fraud,amt) %>% 
+  summarise(count = n()) %>% 
+  # Plot histogram and splited facet by whether is fraud or not
+  ggplot(aes(x=amt)) +
+  geom_histogram() +
+  labs(x= "Amount charged", y= "# of amount charged") +
+  ggtitle("Distribution of amounts charged to credit card") +
+  facet_wrap((~is_fraud)) 
+
+# Find no.of cases, summary of amount, mean, median, and sd for fraud and not fraud cases
+card_fraud %>% 
+  group_by(is_fraud) %>% 
+  summarise(count_cases = n(), sum_amount = sum(amt), mean_amount = mean(amt), median_amount = median(amt), sd_amount = sd(amt))
+
+# What types of purchases are most likely to be instances of fraud? Consider category of merchants and produce a bar chart that shows % of total fraudulent transactions sorted in order.
+card_fraud %>% 
+  # Group by category and count total case for each category
+  group_by(category) %>% 
+  summarise(count = n()) %>% 
+  # Find % of each category's cases per total cases
+  mutate(percent = (count/sum(count))*100) %>% 
+  arrange(desc(percent)) %>% 
+  # Plot bar chart by order of percentage
+  ggplot(aes(x=reorder(category,-percent),y=percent)) +
+  geom_col()+
+  labs(x="Category",y="% of total fraudulent transactions") +
+  ggtitle ("% of total fraudulent transactions by category")
+
+# Is fraud related to distance?
+fraud <- card_fraud %>%  
+  # Filter only fraud cases
+  filter(is_fraud == "1") %>% 
+  # Plot boxplot
+  ggplot(aes(x= is_fraud,y=distance_km)) +
+  geom_boxplot() +
+  ggtitle("Distance between card holder's home and transaction")
+fraud
 ```
 
 Group all variables by type and examine each variable class by class. The dataset has the following types of variables:
@@ -165,25 +214,18 @@ We have plenty of geospatial data as lat/long pairs, so I want to convert city/s
     library(tmap)
     library(sf)
     library(usethis)
-    library(tidyverse)
     library(rnaturalearth)
     library(patchwork)
 
         install.packages("rnaturalearthdata")
-            
-    #    card_fraud %>% 
-    #      group_by(state) %>% 
-    #      summarise(total = sum(amt)) %>% 
-    #      mutate(percent = total/sum(total)) %>% 
-    #      arrange(desc(percent))
         
-        state_geo_address <- card_fraud %>% 
+        city_geo_address <- card_fraud %>% 
           filter(is_fraud == 1) %>% 
-          mutate(state_geo = geo(state, method = "osm"))
+          mutate(city_geo = geo(city, method = "osm"))
         
-        state_geo_for_graph <- state_geo_address %>% 
-          count(state, sort=TRUE) %>%
-          mutate(address_geo = purrr::map(state, geo, method = "osm")) %>%
+        city_geo_for_graph <- city_geo_address %>% 
+          count(city, sort=TRUE) %>%
+          mutate(address_geo = purrr::map(city, geo, method = "osm")) %>%
           unnest_wider(address_geo)
         
         usa <- ne_countries(scale = "medium", returnclass = "sf") %>% 
@@ -193,7 +235,7 @@ We have plenty of geospatial data as lat/long pairs, so I want to convert city/s
         
         ggplot(data = usa) +
         geom_sf(fill = "#fafafa") + # the first two lines just plot the world shapefile
-        geom_point(data = state_geo_for_graph, # then we add points
+        geom_point(data = city_geo_for_graph, # then we add points
           aes(x = long, y = lat),
           size = 2,
           colour = "#001e62") +
