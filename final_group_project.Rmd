@@ -185,13 +185,13 @@ We have plenty of geospatial data as lat/long pairs, so I want to convert city/s
         
         st_geometry(usa)
         
-          ggplot(data = usa) +
-            geom_sf(fill = "#fafafa") + # the first two lines just plot the world shapefile
-             geom_point(data = state_geo_for_graph, # then we add points
-                 aes(x = long, y = lat),
-                 size = 2,
-                 colour = "#001e62") +
-            theme_void()
+        ggplot(data = usa) +
+        geom_sf(fill = "#fafafa") + # the first two lines just plot the world shapefile
+        geom_point(data = state_geo_for_graph, # then we add points
+          aes(x = long, y = lat),
+          size = 2,
+          colour = "#001e62") +
+        theme_void()
     ```
 
 ## Exploring factors: how is the compactness of categories?
