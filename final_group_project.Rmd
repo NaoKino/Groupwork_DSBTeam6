@@ -217,7 +217,6 @@ We have plenty of geospatial data as lat/long pairs, so I want to convert city/s
     library(rnaturalearth)
     library(patchwork)
 
-        install.packages("rnaturalearthdata")
         
         city_geo_address <- card_fraud %>% 
           filter(is_fraud == 1) %>% 
@@ -267,6 +266,7 @@ The predictors `category` and `job` are transformed into factors.
 card_fraud <- card_fraud %>% 
   mutate(category = factor(category),
          job = factor(job))
+
 
 ```
 
@@ -349,6 +349,7 @@ cv_folds
 What steps are you going to add to your recipe? Do you need to do any log transformations?
 
 ```{r, define_recipe}
+#In order to address the heavy left skewness and the presence of a few very large transactions in the data, a log transformation will be applied to the "amt" variable. This transformation will be included as a step in the recipe.
 
 fraud_rec <- recipe(is_fraud ~ ., data = card_fraud_train) %>%
   step_log(amt) %>% 
@@ -680,6 +681,19 @@ model_comp %>%
 ## Which metric to use
 
 This is a highly imbalanced data set, as roughly 99.5% of all transactions are ok, and it's only 0.5% of transactions that are fraudulent. A `naive` model, which classifies everything as ok and not-fraud, would have an accuracy of 99.5%, but what about the sensitivity, specificity, the AUC, etc?
+
+```{r}
+#In highly imbalanced datasets, accuracy alone can be misleading due to the disproportionate representation of the majority class. Therefore, it is important to consider additional metrics that provide a more comprehensive evaluation of the model's performance.
+
+#Given the imbalanced nature of the data, the following metrics are typically recommended:
+
+#Sensitivity/Recall/True Positive Rate: This metric measures the ability of the model to correctly identify positive instances (fraudulent transactions) from the actual positive cases. It is calculated as the ratio of true positives to the sum of true positives and false negatives.
+
+#Specificity/True Negative Rate: This metric measures the ability of the model to correctly identify negative instances (non-fraudulent transactions) from the actual negative cases. It is calculated as the ratio of true negatives to the sum of true negatives and false positives.
+
+#Area Under the Receiver Operating Characteristic Curve (AUC-ROC): This metric provides an aggregate measure of the model's ability to distinguish between positive and negative instances across various probability thresholds. A higher AUC-ROC indicates a better discriminatory power of the model.
+```
+
 
 ## `last_fit()`
 
